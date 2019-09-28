@@ -17,10 +17,32 @@ public class Tournament {
         //Ask for the number of total and human player.
         int numberOfTotalPlayer = getTotalNumber(reader);
         int numberOfHumanPlayer = getHumanNumber(reader, numberOfTotalPlayer);
-
+        int numberOfNonPlayer = numberOfTotalPlayer - numberOfHumanPlayer;
+        List<PlayerStrategy> playerList = new ArrayList<>();
+        for(int i = 0; i < numberOfHumanPlayer; i++) {
+            playerList.add(new HumanPlayer());
+        }
+        for(int i = 0; i < numberOfNonPlayer; i++) {
+            playerList.add(new NonPlayer());
+        }
         
+        do {
+            //Play game
+            String cheater;
+            int currentMaxPoint;
+            boolean cheat = false;
+            do {
 
 
+            } while (currentMaxPoint != ENDING_POINTS && !cheat);
+
+            if (currentMaxPoint == ENDING_POINTS) {
+                System.out.println("This is the end of this tournament, thank you for playing.");
+            }else{
+                System.out.println(cheater + " cheated, this is the end of this is the end of this tournament, thank you for playing.");
+            }
+
+        }while(again(reader));
     }
 
     private static int getTotalNumber(BufferedReader reader) throws IOException{
@@ -30,7 +52,7 @@ public class Tournament {
         do{
             System.out.println("Enter the number of total player (0~5):");
             userInput = reader.readLine().trim();
-            if(!isInteger(userInput)) {
+            if(userInput.isEmpty() || !isInteger(userInput)) {
                 System.out.println("Please enter an integer.");
                 isValidTotalNumber = false;
             }else if(Integer.parseInt(userInput) < MIN_PLAYER_NUMBER || Integer.parseInt(userInput) > MAX_PLAYER_NUMBER) {
@@ -48,7 +70,7 @@ public class Tournament {
         do{
             System.out.println("Enter the number of total player (0~5):");
             userInput = reader.readLine().trim();
-            if(!isInteger(userInput)) {
+            if(userInput.isEmpty() || !isInteger(userInput)) {
                 System.out.println("Please enter an integer.");
                 isValidNumber = false;
             }else if(Integer.parseInt(userInput) < 0 || Integer.parseInt(userInput) > total) {
@@ -67,5 +89,23 @@ public class Tournament {
         }catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    private static boolean again(BufferedReader reader) throws IOException{
+
+        String userInput;
+        boolean valid = true;
+        do{
+            System.out.println("Do you want to start a new tournament?\nPlease enter yes / no, anything else will be considered as no");
+            userInput = reader.readLine().trim();
+            if(userInput.isEmpty()) {
+                System.out.println("Please enter yes / no, anything else will be considered as no");
+                valid = false;
+            }else if(userInput.equalsIgnoreCase("yes")){
+                return true;
+            }
+        }while(!valid);
+
+        return false;
     }
 }

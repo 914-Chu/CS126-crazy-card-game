@@ -1,6 +1,6 @@
 package cardgame;
 
-public class HumanPlayer extends PlayerStrategy{
+public class HumanPlayer implements PlayerStrategy{
 
 
 }
