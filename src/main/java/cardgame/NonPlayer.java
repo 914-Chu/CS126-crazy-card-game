@@ -1,14 +1,11 @@
 package cardgame;
 
-import sun.swing.MenuItemLayoutHelper;
-
-import java.io.*;
 import java.util.*;
-
 
 public class NonPlayer implements PlayerStrategy {
 
     private int playerId;
+    private Card topPileCard;
     private List<Integer> opponentIds;
     private List<PlayerTurn> opponentActions;
     private List<Card> cards;
@@ -63,6 +60,8 @@ public class NonPlayer implements PlayerStrategy {
      */
     public boolean shouldDrawCard(Card topPileCard, Card.Suit changedSuit){
 
+        this.topPileCard = topPileCard;
+
         if(changedSuit != null) {
             for(Card card : cards) {
                 if(card.getRank() == Card.Rank.EIGHT || card.getSuit() == changedSuit) {
@@ -102,24 +101,26 @@ public class NonPlayer implements PlayerStrategy {
      * @return The card this player wishes to put on top of the pile
      */
 //    1. eights
-//    2. card in minSuit with maxPointValue
-//    3. card with maxPointValue
+//    2. card with max point value that has same suit with top pile card
+//    3. card has same rank with top pile card with maxSuit
+//    4. card with max point value
     public Card playCard() {
 
-        Card.Suit minSuit = findMinSuit();
-        List<Card> cardWithMinSuit = new ArrayList<>();
+        List<Card> cardWithMaxSuit = new ArrayList<>();
         Card toPlay = findMaxPointValue(validToPlay);
 
         for(Card card : validToPlay) {
             if(card.getRank() == Card.Rank.EIGHT) {
                 toPlay = card;
-            }else if(card.getSuit() == minSuit){
-                cardWithMinSuit.add(card);
+            }else if(topPileCard.getSuit() == findMaxSuit()){
+                cardWithMaxSuit.add(card);
+            }else if(topPileCard.getRank() == card.getRank() && card.getSuit() == findMaxSuit()) {
+                toPlay = card;
             }
         }
 
-        if(!cardWithMinSuit.isEmpty()){
-            toPlay = findMaxPointValue(cardWithMinSuit);
+        if(!cardWithMaxSuit.isEmpty()){
+            toPlay = findMaxPointValue(cardWithMaxSuit);
         }
         updateSuitList(toPlay.getSuit(), false);
 
@@ -189,20 +190,6 @@ public class NonPlayer implements PlayerStrategy {
         return maxSuit;
     }
 
-    private Card.Suit findMinSuit() {
-
-        int min = currentSuits.get(currentSuits.keySet().toArray()[0]);
-        Card.Suit minSuit = null;
-
-        for (Map.Entry<Card.Suit,Integer> entry : currentSuits.entrySet()) {
-            if(entry.getValue() < min){
-                min = entry.getValue();
-                minSuit = entry.getKey();
-            }
-        }
-        return minSuit;
-    }
-
     private Card findMaxPointValue(List<Card> cardList) {
 
         int max = 0;
@@ -216,4 +203,5 @@ public class NonPlayer implements PlayerStrategy {
         }
         return cardWithMaxPointValue;
     }
+
 }
