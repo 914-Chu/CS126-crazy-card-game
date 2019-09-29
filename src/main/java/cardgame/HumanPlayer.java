@@ -9,6 +9,10 @@ public class HumanPlayer implements PlayerStrategy{
     private List<Integer> opponentIds;
     private List<Card> cards;
     private List<PlayerTurn> opponentActions;
+    private List<Card> validToPlay = new ArrayList<>();
+    private List<Card.Suit> currentSuitList = new ArrayList<>();
+    private Random rand = new Random();
+
     /**
      * Gives the player their assigned id, as well as a list of the opponents' assigned ids.
      * <p>
@@ -32,6 +36,9 @@ public class HumanPlayer implements PlayerStrategy{
     public void receiveInitialCards(List<Card> cards) {
 
         this.cards = cards;
+        for(Card card : this.cards) {
+            currentSuitList.add(card.getSuit());
+        }
     }
 
     /**
@@ -47,9 +54,22 @@ public class HumanPlayer implements PlayerStrategy{
      *                    played. Will be null if no "8" was played.
      * @return whether or not the player wants to draw
      */
-    public boolean shouldDrawCard(Card topPileCard, Card.Suit changedSuit){
+    public boolean shouldDrawCard(Card topPileCard, Card.Suit changedSuit) {
 
-
+        if(changedSuit != null) {
+            for(Card card : cards) {
+                if(card.getSuit() == changedSuit) {
+                    validToPlay.add(card);
+                }
+            }
+        }else {
+            for(Card card : cards){
+                if(card.getSuit() == topPileCard.getSuit() || card.getRank() == topPileCard.getRank()){
+                    validToPlay.add(card);
+                }
+            }
+        }
+        return validToPlay.isEmpty();
     }
 
     /**
