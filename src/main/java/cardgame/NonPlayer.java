@@ -10,6 +10,8 @@ public class NonPlayer implements PlayerStrategy {
     private List<Integer> opponentIds;
     private List<Card> cards;
     private List<PlayerTurn> opponentActions;
+    private List<Card> validToPlay = new ArrayList<>();
+    private List<Card.Suit> validSuit = new ArrayList<>();
     private Random rand;
     /**
      * Gives the player their assigned id, as well as a list of the opponents' assigned ids.
@@ -51,7 +53,22 @@ public class NonPlayer implements PlayerStrategy {
      */
     public boolean shouldDrawCard(Card topPileCard, Card.Suit changedSuit){
 
-
+        if(changedSuit != null) {
+            for(Card card : cards) {
+                if(card.getSuit() == changedSuit) {
+                    validToPlay.add(card);
+                }
+            }
+            if(!validToPlay.isEmpty()) validSuit.add(changedSuit);
+        }else {
+            for(Card card : cards){
+                if(card.getSuit() == topPileCard.getSuit() || card.getRank() == topPileCard.getRank()){
+                    validToPlay.add(card);
+                    validSuit.add(card.getSuit());
+                }
+            }
+        }
+        return validToPlay.isEmpty();
     }
 
     /**
@@ -76,7 +93,8 @@ public class NonPlayer implements PlayerStrategy {
      */
     public Card playCard() {
 
-        return askCard();
+        int randomIndex = rand.nextInt(validToPlay.size());
+        return validToPlay.get(randomIndex);
     }
 
     /**
@@ -88,7 +106,8 @@ public class NonPlayer implements PlayerStrategy {
      */
     public Card.Suit declareSuit() {
 
-        return askSuit();
+        int randomIndex = rand.nextInt(validToPlay.size());
+        return validSuit.get(randomIndex);
     }
 
     /**
@@ -107,16 +126,7 @@ public class NonPlayer implements PlayerStrategy {
      */
     public void reset() {
 
-
+        validToPlay.clear();
     }
 
-    private Card askCard() throws IOException {
-
-
-    }
-
-    private Card.Suit askSuit() throws IOException {
-
-
-    }
 }
