@@ -11,6 +11,7 @@ public class NonPlayer2 implements PlayerStrategy {
     private List<Card> validToPlay = new ArrayList<>();
     private Map<Card.Suit, Integer> currentSuits = new HashMap<>();
     private Random rand = new Random();
+
     /**
      * Gives the player their assigned id, as well as a list of the opponents' assigned ids.
      * <p>
