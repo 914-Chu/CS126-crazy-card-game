@@ -9,8 +9,8 @@ public class NonPlayer1 implements PlayerStrategy {
     private List<Integer> opponentIds;
     private List<PlayerTurn> opponentActions;
     private List<Card> cards;
-    private List<Card> validToPlay = new ArrayList<>();
-    private Map<Card.Suit, Integer> currentSuits = new HashMap<>();
+    private List<Card> validToPlay;
+    private Map<Card.Suit, Integer> currentSuits;
 
     /**
      * Gives the player their assigned id, as well as a list of the opponents' assigned ids.
@@ -35,6 +35,9 @@ public class NonPlayer1 implements PlayerStrategy {
     public void receiveInitialCards(List<Card> cards) {
 
         this.cards = cards;
+        validToPlay = new ArrayList<>();
+        currentSuits = new HashMap<>();
+
         for(Card card : this.cards) {
             Card.Suit suit = card.getSuit();
             if(currentSuits.containsKey(suit)) {
@@ -157,11 +160,6 @@ public class NonPlayer1 implements PlayerStrategy {
     public void reset() {
 
         validToPlay.clear();
-    }
-
-    public int getPlayerId() {
-
-        return playerId;
     }
 
     private void updateSuitList(Card.Suit suit, boolean receive) {

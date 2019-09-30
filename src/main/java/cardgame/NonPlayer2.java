@@ -8,8 +8,8 @@ public class NonPlayer2 implements PlayerStrategy {
     private List<Integer> opponentIds;
     private List<PlayerTurn> opponentActions;
     private List<Card> cards;
-    private List<Card> validToPlay = new ArrayList<>();
-    private Map<Card.Suit, Integer> currentSuits = new HashMap<>();
+    private List<Card> validToPlay;
+    private Map<Card.Suit, Integer> currentSuits;
     private Random rand = new Random();
 
     /**
@@ -35,6 +35,9 @@ public class NonPlayer2 implements PlayerStrategy {
     public void receiveInitialCards(List<Card> cards) {
 
         this.cards = cards;
+        validToPlay = new ArrayList<>();
+        currentSuits = new HashMap<>();
+
         for(Card card : this.cards) {
             Card.Suit suit = card.getSuit();
             if(currentSuits.containsKey(suit)) {
@@ -144,7 +147,7 @@ public class NonPlayer2 implements PlayerStrategy {
 
     public int getPlayerId() {
 
-        return getPlayerId();
+        return playerId;
     }
 
     private void updateSuitList(Card.Suit suit, boolean receive) {

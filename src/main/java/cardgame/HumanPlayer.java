@@ -195,11 +195,6 @@ public class HumanPlayer implements PlayerStrategy{
         validToPlay.clear();
     }
 
-    public int getPlayerId() {
-
-        return playerId;
-    }
-
     private boolean agree() throws IOException {
 
         String input = reader.readLine().trim().toLowerCase();
