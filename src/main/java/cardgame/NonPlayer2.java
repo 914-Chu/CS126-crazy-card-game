@@ -2,10 +2,9 @@ package cardgame;
 
 import java.util.*;
 
-public class NonPlayer implements PlayerStrategy {
+public class NonPlayer2 implements PlayerStrategy {
 
     private int playerId;
-    private Card topPileCard;
     private List<Integer> opponentIds;
     private List<PlayerTurn> opponentActions;
     private List<Card> cards;
@@ -60,8 +59,6 @@ public class NonPlayer implements PlayerStrategy {
      */
     public boolean shouldDrawCard(Card topPileCard, Card.Suit changedSuit){
 
-        this.topPileCard = topPileCard;
-
         if(changedSuit != null) {
             for(Card card : cards) {
                 if(card.getRank() == Card.Rank.EIGHT || card.getSuit() == changedSuit) {
@@ -106,24 +103,9 @@ public class NonPlayer implements PlayerStrategy {
 //    4. card with max point value
     public Card playCard() {
 
-        List<Card> cardWithMaxSuit = new ArrayList<>();
-        Card toPlay = findMaxPointValue(validToPlay);
-
-        for(Card card : validToPlay) {
-            if(card.getRank() == Card.Rank.EIGHT) {
-                toPlay = card;
-            }else if(topPileCard.getSuit() == findMaxSuit()){
-                cardWithMaxSuit.add(card);
-            }else if(topPileCard.getRank() == card.getRank() && card.getSuit() == findMaxSuit()) {
-                toPlay = card;
-            }
-        }
-
-        if(!cardWithMaxSuit.isEmpty()){
-            toPlay = findMaxPointValue(cardWithMaxSuit);
-        }
+        Card toPlay = validToPlay.get(rand.nextInt(validToPlay.size()));
+        cards.remove(toPlay);
         updateSuitList(toPlay.getSuit(), false);
-
         return toPlay;
     }
 
@@ -136,7 +118,8 @@ public class NonPlayer implements PlayerStrategy {
      */
     public Card.Suit declareSuit() {
 
-        return findMaxSuit();
+        List<Card.Suit> suits = new ArrayList<>(currentSuits.keySet());
+        return suits.get(rand.nextInt(suits.size()));
     }
 
     /**
@@ -161,7 +144,7 @@ public class NonPlayer implements PlayerStrategy {
 
     private void updateSuitList(Card.Suit suit, boolean receive) {
 
-        if (receive) {
+        if(receive) {
             if(currentSuits.containsKey(suit)) {
                 currentSuits.put(suit, (currentSuits.get(suit)) + 1);
             }else {
@@ -174,34 +157,6 @@ public class NonPlayer implements PlayerStrategy {
                 currentSuits.remove(suit);
             }
         }
-    }
-
-    private Card.Suit findMaxSuit() {
-
-        int max = 0;
-        Card.Suit maxSuit = null;
-
-        for (Map.Entry<Card.Suit,Integer> entry : currentSuits.entrySet()) {
-            if(entry.getValue() > max){
-                max = entry.getValue();
-                maxSuit = entry.getKey();
-            }
-        }
-        return maxSuit;
-    }
-
-    private Card findMaxPointValue(List<Card> cardList) {
-
-        int max = 0;
-        Card cardWithMaxPointValue = null;
-
-        for (Card card : cardList) {
-            if(card.getPointValue() > max){
-                max = card.getPointValue();
-                cardWithMaxPointValue = card;
-            }
-        }
-        return cardWithMaxPointValue;
     }
 
 }

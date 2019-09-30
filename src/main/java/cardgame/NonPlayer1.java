@@ -1,9 +1,8 @@
 package cardgame;
 
-import java.io.*;
 import java.util.*;
 
-public class HumanPlayer implements PlayerStrategy{
+public class NonPlayer1 implements PlayerStrategy {
 
     private int playerId;
     private Card topPileCard;
@@ -12,9 +11,7 @@ public class HumanPlayer implements PlayerStrategy{
     private List<Card> cards;
     private List<Card> validToPlay = new ArrayList<>();
     private Map<Card.Suit, Integer> currentSuits = new HashMap<>();
-    private BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
     private Random rand = new Random();
-
     /**
      * Gives the player their assigned id, as well as a list of the opponents' assigned ids.
      * <p>
@@ -61,33 +58,25 @@ public class HumanPlayer implements PlayerStrategy{
      *                    played. Will be null if no "8" was played.
      * @return whether or not the player wants to draw
      */
-    public boolean shouldDrawCard(Card topPileCard, Card.Suit changedSuit) {
+    public boolean shouldDrawCard(Card topPileCard, Card.Suit changedSuit){
 
         this.topPileCard = topPileCard;
 
         if(changedSuit != null) {
             for(Card card : cards) {
-                if(card.getSuit() == changedSuit) {
+                if(card.getRank() == Card.Rank.EIGHT || card.getSuit() == changedSuit) {
                     validToPlay.add(card);
                 }
             }
         }else {
             for(Card card : cards){
-                if(card.getSuit() == topPileCard.getSuit() || card.getRank() == topPileCard.getRank()){
+                if(card.getRank() == Card.Rank.EIGHT || card.getSuit() == topPileCard.getSuit() || card.getRank() == topPileCard.getRank()){
                     validToPlay.add(card);
                 }
             }
         }
 
-        if(!validToPlay.isEmpty()) {
-            try {
-                System.out.println("Do you want to draw a card?\n(Please enter yes / no, anything else will be seen as no");
-                return agree();
-            }catch(IOException e) {
-                System.out.println("This should never happen.");
-            }
-        }
-        return false;
+        return validToPlay.isEmpty();
     }
 
     /**
@@ -111,36 +100,28 @@ public class HumanPlayer implements PlayerStrategy{
      *
      * @return The card this player wishes to put on top of the pile
      */
+//    1. eights
+//    2. card with max point value that has same suit with top pile card
+//    3. card has same rank with top pile card with maxSuit
+//    4. card with max point value
     public Card playCard() {
 
-        int randomIndex = rand.nextInt(validToPlay.size());
-        Card toPlay = validToPlay.get(randomIndex);
+        List<Card> cardWithMaxSuit = new ArrayList<>();
+        Card toPlay = findMaxPointValue(validToPlay);
 
-        System.out.println("Here's the list of your cards:");
-        for(int i = 0; i < cards.size(); i++) {
-            Card current = cards.get(i);
-            System.out.println(i + ". " + current.getSuit() + " "
-                    + current.getRank() + ":  " + current.getPointValue() + " point(s)");
-        }
-        boolean again =  false;
-
-        do {
-            System.out.println("Which card to you want to play?\n(Please enter an integer)");
-            try {
-                String userInput = reader.readLine().trim();
-                toPlay = cards.get(Integer.parseInt(userInput));
-
-                if(!validToPlay.contains(toPlay)) {
-                    System.out.println("This card is invalid, do you still want to play it?");
-                    System.out.println("(Please enter yes / no, anything else will be seen as no)");
-                    again = agree();
-                }
-            } catch (IOException e) {
-                System.out.println("Reading failed, a random card will be played.");
-            } catch (NumberFormatException e) {
-                System.out.println("Not an integer, a random card will be played.");
+        for(Card card : validToPlay) {
+            if(card.getRank() == Card.Rank.EIGHT) {
+                toPlay = card;
+            }else if(topPileCard.getSuit() == findMaxSuit()){
+                cardWithMaxSuit.add(card);
+            }else if(topPileCard.getRank() == card.getRank() && card.getSuit() == findMaxSuit()) {
+                toPlay = card;
             }
-        } while (again);
+        }
+
+        if(!cardWithMaxSuit.isEmpty()){
+            toPlay = findMaxPointValue(cardWithMaxSuit);
+        }
 
         cards.remove(toPlay);
         updateSuitList(toPlay.getSuit(), false);
@@ -156,24 +137,7 @@ public class HumanPlayer implements PlayerStrategy{
      */
     public Card.Suit declareSuit() {
 
-        List<Card.Suit> suits = new ArrayList<>(currentSuits.keySet());
-        Card.Suit toDeclare = suits.get( rand.nextInt(suits.size()));
-
-        System.out.println("Here's a list of all the suits you have:");
-        for(int i = 0; i < suits.size(); i++) {
-            System.out.println(i + ". " + suits.get(i));
-        }
-        System.out.println("Which suit do you want to declare?");
-        try {
-            String userInput = reader.readLine().trim();
-            toDeclare = suits.get(Integer.parseInt(userInput));
-        }catch(IOException e) {
-            System.out.println("Reading failed, a random suit will be declared.");
-        }catch(NumberFormatException e) {
-            System.out.println("Not an integer, a random suit will be declared.");
-        }
-
-        return toDeclare;
+        return findMaxSuit();
     }
 
     /**
@@ -195,15 +159,10 @@ public class HumanPlayer implements PlayerStrategy{
         validToPlay.clear();
     }
 
-    private boolean agree() throws IOException {
-
-        String input = reader.readLine().trim().toLowerCase();
-        return input.equals("yes");
-    }
 
     private void updateSuitList(Card.Suit suit, boolean receive) {
 
-        if (receive) {
+        if(receive) {
             if(currentSuits.containsKey(suit)) {
                 currentSuits.put(suit, (currentSuits.get(suit)) + 1);
             }else {
@@ -217,4 +176,33 @@ public class HumanPlayer implements PlayerStrategy{
             }
         }
     }
+
+    private Card.Suit findMaxSuit() {
+
+        int max = 0;
+        Card.Suit maxSuit = null;
+
+        for (Map.Entry<Card.Suit,Integer> entry : currentSuits.entrySet()) {
+            if(entry.getValue() > max){
+                max = entry.getValue();
+                maxSuit = entry.getKey();
+            }
+        }
+        return maxSuit;
+    }
+
+    private Card findMaxPointValue(List<Card> cardList) {
+
+        int max = 0;
+        Card cardWithMaxPointValue = null;
+
+        for (Card card : cardList) {
+            if(card.getPointValue() > max){
+                max = card.getPointValue();
+                cardWithMaxPointValue = card;
+            }
+        }
+        return cardWithMaxPointValue;
+    }
+
 }

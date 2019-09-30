@@ -3,7 +3,7 @@ package cardgame;
 import java.util.*;
 import java.io.*;
 
-public class Tournament {
+public class Tournament2 {
 
     private static final int ENDING_POINTS = 200;
     private static final int MAX_PLAYER_NUMBER = 5;
@@ -14,18 +14,18 @@ public class Tournament {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Welcome to the Crazy 8's card game.\n");
 
-        //Ask for the number of total and human player.
-        int numberOfTotalPlayer = getTotalNumber(reader);
-        int numberOfHumanPlayer = getHumanNumber(reader, numberOfTotalPlayer);
-        int numberOfNonPlayer = numberOfTotalPlayer - numberOfHumanPlayer;
-
-        List<PlayerStrategy> playerList = new ArrayList<>();
-        for(int i = 0; i < numberOfHumanPlayer; i++) {
-            playerList.add(new HumanPlayer());
-        }
-        for(int i = 0; i < numberOfNonPlayer; i++) {
-            playerList.add(new NonPlayer());
-        }
+//        //Ask for the number of total and human player.
+//        int numberOfTotalPlayer = getTotalNumber(reader);
+//        int numberOfHumanPlayer = getHumanNumber(reader, numberOfTotalPlayer);
+//        int numberOfNonPlayer = numberOfTotalPlayer - numberOfHumanPlayer;
+//
+//        List<PlayerStrategy> playerList = new ArrayList<>();
+//        for(int i = 0; i < numberOfHumanPlayer; i++) {
+//            playerList.add(new HumanPlayer());
+//        }
+//        for(int i = 0; i < numberOfNonPlayer; i++) {
+//            playerList.add(new NonPlayer());
+//        }
 
         do {
             //Play game
@@ -54,11 +54,9 @@ public class Tournament {
             System.out.println("Enter the number of total player (0~5):");
             userInput = reader.readLine().trim();
 
-            if(userInput.isEmpty() || !isInteger(userInput)) {
-                System.out.println("Please enter an integer.");
-                isValidTotalNumber = false;
-            }else if(Integer.parseInt(userInput) < MIN_PLAYER_NUMBER || Integer.parseInt(userInput) > MAX_PLAYER_NUMBER) {
-                System.out.println("Please enter an integer between 0 to 5.");
+            if(userInput.isEmpty() || !isInteger(userInput)
+                    || Integer.parseInt(userInput) < MIN_PLAYER_NUMBER
+                    || Integer.parseInt(userInput) > MAX_PLAYER_NUMBER) {
                 isValidTotalNumber = false;
             }
         }while(!isValidTotalNumber);
@@ -70,14 +68,12 @@ public class Tournament {
         String userInput;
         boolean isValidNumber = true;
         do{
-            System.out.println("Enter the number of total player (0~5):");
+            System.out.println("Enter the number of human player (0~" + total + "):");
             userInput = reader.readLine().trim();
 
-            if(userInput.isEmpty() || !isInteger(userInput)) {
-                System.out.println("Please enter an integer.");
-                isValidNumber = false;
-            }else if(Integer.parseInt(userInput) < 0 || Integer.parseInt(userInput) > total) {
-                System.out.println("Please enter an integer between 0 to " + total + ".");
+            if(userInput.isEmpty() || !isInteger(userInput)
+                    || Integer.parseInt(userInput) < 0
+                    || Integer.parseInt(userInput) > total) {
                 isValidNumber = false;
             }
         }while(!isValidNumber);
