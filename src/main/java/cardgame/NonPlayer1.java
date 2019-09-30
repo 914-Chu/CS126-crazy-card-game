@@ -159,6 +159,10 @@ public class NonPlayer1 implements PlayerStrategy {
         validToPlay.clear();
     }
 
+    public int getPlayerId() {
+
+        return playerId;
+    }
 
     private void updateSuitList(Card.Suit suit, boolean receive) {
 
