@@ -1,6 +1,5 @@
 package cardgame;
 
-import java.io.InputStreamReader;
 import java.util.*;
 
 public class Game1 {
@@ -18,7 +17,7 @@ public class Game1 {
     private int currentHighestPoint;
     private Card.Suit changedSuit;
     private List<PlayerStrategy> playerList;
-    private List<Integer> scoreBoard;
+    private List<Integer> scoreBoardPerGame;
     private List<Integer> winCount;
     private List<Card> drawPile;
     private List<Card> discardPile;
@@ -28,6 +27,7 @@ public class Game1 {
         win = false;
         cheat = false;
         currentHighestPoint = 0;
+        scoreBoardPerGame = new ArrayList<>();
 
         playerList = new ArrayList<>();
         playerList.add(new NonPlayer1());
@@ -36,19 +36,18 @@ public class Game1 {
         for(int i = 0; i < playerList.size(); i++) {
             playerList.get(i).init(i, opponentIds(i));
         }
-
-        //Create score board
-        scoreBoard = new ArrayList<>();
-        winCount = new ArrayList<>();
-        for(int i = 0; i < TOTAL_PLAYER; i ++) {
-            scoreBoard.add(0);
-            winCount.add(0);
-        }
     }
 
     public void setup() {
 
         changedSuit = null;
+
+        //Create score board
+        winCount = new ArrayList<>();
+        for(int i = 0; i < TOTAL_PLAYER; i ++) {
+            scoreBoardPerGame.add(0);
+            winCount.add(0);
+        }
 
         //deal 5 cards to each player
         drawPile = new ArrayList<>(Card.getDeck());
@@ -70,7 +69,7 @@ public class Game1 {
 
     public void play() {
 
-        while(endOfGame()) {
+        while(!endOfGame()) {
             Card topDiscardCard = discardPile.get(discardPile.size() - 1);
 
             for (int i = 0; i < TOTAL_PLAYER; i++) {
@@ -81,7 +80,7 @@ public class Game1 {
                 } else {
                     Card played = playerList.get(i).playCard();
                     discardPile.add(played);
-
+                    //sort the played card
                     if (played.getRank() == Card.Rank.EIGHT) {
                         changedSuit = playerList.get(i).declareSuit();
                     } else if (isValid(played, topDiscardCard)) {
@@ -92,8 +91,11 @@ public class Game1 {
                     }
                 }
             }
+
+
         }
-        currentHighestPoint = highestPointPlayer(scoreBoard);
+
+
     }
 
     public boolean ifCheat() {
