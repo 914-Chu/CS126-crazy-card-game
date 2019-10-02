@@ -2,15 +2,15 @@ package cardgame;
 
 import java.util.*;
 
-public class NonPlayer1 implements PlayerStrategy {
+public class Cheater implements PlayerStrategy{
 
     private int playerId;
     private List<Integer> opponentIds;
     private List<PlayerTurn> opponentActions;
-    private Card topPileCard;
     private List<Card> cards;
     private List<Card> validToPlay;
     private Map<Card.Suit, Integer> currentSuits;
+    private Random rand = new Random();
 
     /**
      * Gives the player their assigned id, as well as a list of the opponents' assigned ids.
@@ -25,7 +25,7 @@ public class NonPlayer1 implements PlayerStrategy {
 
         this.playerId = playerId;
         this.opponentIds = opponentIds;
-        System.out.println("Player1: init");
+        System.out.println("Player2: init");
     }
 
     /**
@@ -47,7 +47,8 @@ public class NonPlayer1 implements PlayerStrategy {
                 currentSuits.put(suit, 1);
             }
         }
-        System.out.println("Player1: receiveInitialCards.");
+        System.out.println("Player2: receiveInitialCards.");
+
     }
 
     /**
@@ -65,8 +66,6 @@ public class NonPlayer1 implements PlayerStrategy {
      */
     public boolean shouldDrawCard(Card topPileCard, Card.Suit changedSuit){
 
-        this.topPileCard = topPileCard;
-
         if(changedSuit != null) {
             for(Card card : cards) {
                 if(card.getRank() == Card.Rank.EIGHT || card.getSuit() == changedSuit) {
@@ -74,13 +73,13 @@ public class NonPlayer1 implements PlayerStrategy {
                 }
             }
         }else {
-            for(Card card : cards) {
+            for(Card card : cards){
                 if(card.getRank() == Card.Rank.EIGHT || card.getSuit() == topPileCard.getSuit() || card.getRank() == topPileCard.getRank()){
                     validToPlay.add(card);
                 }
             }
         }
-        System.out.println("Player1: shouldDrawCard.");
+        System.out.println("Player2: shouldDrawCard.");
         return validToPlay.isEmpty();
     }
 
@@ -95,7 +94,8 @@ public class NonPlayer1 implements PlayerStrategy {
             cards.add(drawnCard);
             updateSuitList(drawnCard.getSuit(), true);
         }
-        System.out.println("Player1: receivedCard.");
+        System.out.println("Player2: receivedCard.");
+
     }
 
     /**
@@ -112,26 +112,10 @@ public class NonPlayer1 implements PlayerStrategy {
 //    4. card with max point value
     public Card playCard() {
 
-        List<Card> cardsWithMaxSuit = new ArrayList<>();
-        Card toPlay = findMaxPointValue(validToPlay);
-
-        for(Card card : validToPlay) {
-            if(card.getRank() == Card.Rank.EIGHT) {
-                toPlay = card;
-            }else if(topPileCard.getSuit() == findMaxSuit()){
-                cardsWithMaxSuit.add(card);
-            }else if(topPileCard.getRank() == card.getRank() && card.getSuit() == findMaxSuit()) {
-                toPlay = card;
-            }
-        }
-
-        if(!cardsWithMaxSuit.isEmpty()){
-            toPlay = findMaxPointValue(cardsWithMaxSuit);
-        }
-
+        Card toPlay = validToPlay.get(rand.nextInt(validToPlay.size()));
         cards.remove(toPlay);
         updateSuitList(toPlay.getSuit(), false);
-        System.out.println("Player1: playCard");
+        System.out.println("Player2: playCard");
         return toPlay;
     }
 
@@ -144,8 +128,10 @@ public class NonPlayer1 implements PlayerStrategy {
      */
     public Card.Suit declareSuit() {
 
-        System.out.println("Player1: declareSuit");
-        return findMaxSuit();
+
+        List<Card.Suit> suits = new ArrayList<>(currentSuits.keySet());
+        System.out.println("Player2: declareSuit");
+        return suits.get(rand.nextInt(suits.size()));
     }
 
     /**
@@ -164,8 +150,8 @@ public class NonPlayer1 implements PlayerStrategy {
      */
     public void reset() {
 
+        System.out.println("Player2: reset");
         validToPlay.clear();
-        System.out.println("Player1: reset");
     }
 
     private void updateSuitList(Card.Suit suit, boolean receive) {
@@ -183,37 +169,7 @@ public class NonPlayer1 implements PlayerStrategy {
                 currentSuits.remove(suit);
             }
         }
-        System.out.println("Player1: updateSuitList");
-    }
-
-    private Card.Suit findMaxSuit() {
-
-        int max = 0;
-        Card.Suit maxSuit = null;
-
-        for (Map.Entry<Card.Suit,Integer> entry : currentSuits.entrySet()) {
-            if(entry.getValue() > max){
-                max = entry.getValue();
-                maxSuit = entry.getKey();
-            }
-        }
-        System.out.println("Player1: findMaxSuit");
-        return maxSuit;
-    }
-
-    private Card findMaxPointValue(List<Card> cardList) {
-
-        int max = 0;
-        Card cardWithMaxPointValue = null;
-
-        for (Card card : cardList) {
-            if(card.getPointValue() > max){
-                max = card.getPointValue();
-                cardWithMaxPointValue = card;
-            }
-        }
-        System.out.println("Player1: findMaxPointValue");
-        return cardWithMaxPointValue;
+        System.out.println("Player2: updateSuitList");
     }
 
 }

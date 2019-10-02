@@ -25,6 +25,7 @@ public class NonPlayer2 implements PlayerStrategy {
 
         this.playerId = playerId;
         this.opponentIds = opponentIds;
+        System.out.println("Player2: init");
     }
 
     /**
@@ -46,6 +47,8 @@ public class NonPlayer2 implements PlayerStrategy {
                 currentSuits.put(suit, 1);
             }
         }
+        System.out.println("Player2: receiveInitialCards.");
+
     }
 
     /**
@@ -76,7 +79,7 @@ public class NonPlayer2 implements PlayerStrategy {
                 }
             }
         }
-
+        System.out.println("Player2: shouldDrawCard.");
         return validToPlay.isEmpty();
     }
 
@@ -91,6 +94,8 @@ public class NonPlayer2 implements PlayerStrategy {
             cards.add(drawnCard);
             updateSuitList(drawnCard.getSuit(), true);
         }
+        System.out.println("Player2: receivedCard.");
+
     }
 
     /**
@@ -110,6 +115,7 @@ public class NonPlayer2 implements PlayerStrategy {
         Card toPlay = validToPlay.get(rand.nextInt(validToPlay.size()));
         cards.remove(toPlay);
         updateSuitList(toPlay.getSuit(), false);
+        System.out.println("Player2: playCard");
         return toPlay;
     }
 
@@ -122,7 +128,9 @@ public class NonPlayer2 implements PlayerStrategy {
      */
     public Card.Suit declareSuit() {
 
+
         List<Card.Suit> suits = new ArrayList<>(currentSuits.keySet());
+        System.out.println("Player2: declareSuit");
         return suits.get(rand.nextInt(suits.size()));
     }
 
@@ -142,12 +150,8 @@ public class NonPlayer2 implements PlayerStrategy {
      */
     public void reset() {
 
+        System.out.println("Player2: reset");
         validToPlay.clear();
-    }
-
-    public int getPlayerId() {
-
-        return playerId;
     }
 
     private void updateSuitList(Card.Suit suit, boolean receive) {
@@ -165,6 +169,7 @@ public class NonPlayer2 implements PlayerStrategy {
                 currentSuits.remove(suit);
             }
         }
+        System.out.println("Player2: updateSuitList");
     }
 
 }

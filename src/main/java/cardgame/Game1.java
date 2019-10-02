@@ -30,10 +30,13 @@ public class Game1 {
         playerList = new ArrayList<>();
         playerList.add(new NonPlayer1());
         playerList.add(new NonPlayer2());
+        playerList.add(new NonPlayer1());
+        playerList.add(new NonPlayer2());
 
-        for(int i = 0; i < playerList.size(); i++) {
+        for(int i = 0; i < TOTAL_PLAYER; i++) {
             playerList.get(i).init(i, opponentIds(i));
         }
+        System.out.println("Game1: constructed.");
     }
 
     public void setup() {
@@ -51,6 +54,7 @@ public class Game1 {
             playerCards.put(i, deal);
             drawPile.subList(TOP_CARD, INITIAL_CARDS).clear();
         }
+        System.out.println("Initial cards are dealt.");
 
         //get first card of discard pile
         discardPile = new ArrayList<>();
@@ -59,6 +63,7 @@ public class Game1 {
         }
         discardPile.add(drawPile.get(TOP_CARD));
         drawPile.remove(TOP_CARD);
+        System.out.println("First card is discarded.");
     }
 
     public void play() {
@@ -67,26 +72,29 @@ public class Game1 {
             Card topDiscardCard = discardPile.get(discardPile.size() - 1);
 
             for (int i = 0; i < TOTAL_PLAYER; i++) {
-
+                System.out.println("Player " + i + ":");
                 if (playerList.get(i).shouldDrawCard(topDiscardCard, changedSuit)) {
                     //draw card
                     Card drawn = drawPile.get(TOP_CARD);
                     playerList.get(i).receiveCard(drawn);
                     playerCards.get(i).add(drawn);
                     drawPile.remove(TOP_CARD);
+                    System.out.println(drawn.getSuit() + " "+ drawn.getRank() + " is drawn.");
                 } else {
                     //play card
                     Card played = playerList.get(i).playCard();
                     playerCards.get(i).remove(played);
                     discardPile.add(played);
-
+                    System.out.println(played.getSuit() + " "+ played.getRank() + " is played.");
                     win = checkWin();
 
                     //sort the played card
                     if (played.getRank() == Card.Rank.EIGHT) {
                         changedSuit = playerList.get(i).declareSuit();
+                        System.out.println("An eight is played");
                     } else if (isValid(played, topDiscardCard)) {
                         changedSuit = null;
+                        System.out.println("This is a normal card");
                     } else {
                         cheat = true;
                         cheater = i;
@@ -103,6 +111,11 @@ public class Game1 {
             gameScoreboard.calculate(playerCards);
             System.out.println(TIE_MESSAGE);
         }
+    }
+
+    public boolean cheated() {
+
+        return cheat;
     }
 
     public int getCheater() {

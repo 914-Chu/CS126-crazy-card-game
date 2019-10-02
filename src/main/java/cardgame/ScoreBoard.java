@@ -31,6 +31,7 @@ public class ScoreBoard {
         for(int i = 0; i < playerNumber; i++) {
             scoreList.set(i, sum - totalPerPlayer[i]);
         }
+        System.out.println("Calculation without winner");
     }
 
     public void calculate(Map<Integer, List<Card>> playerCards, int winner) {
@@ -43,6 +44,7 @@ public class ScoreBoard {
         }
         int sum = IntStream.of(totalPerPlayer).sum();
         scoreList.set(winner, sum - totalPerPlayer[winner]);
+        System.out.println("Calculation with winner.");
     }
 
     public void reset() {
@@ -51,13 +53,15 @@ public class ScoreBoard {
         for(int i = 0; i < playerNumber; i++) {
             scoreList.add(0);
         }
+        System.out.println("Scoreboard is reset.");
     }
 
     public void addNewScore(List<Integer> gameScore) {
-        
+
         for(int i = 0; i < playerNumber; i++) {
             scoreList.set(i, scoreList.get(i) + gameScore.get(i));
         }
+        System.out.println("Game score is added to tournament score.");
     }
 
     public List<Integer> getScoreList() {
