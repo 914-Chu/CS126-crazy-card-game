@@ -4,30 +4,28 @@ import java.util.*;
 
 public class Game1 {
 
-    private static final int TOTAL_PLAYER = 2;
+    private static final int TOTAL_PLAYER = 4;
     private static final int INITIAL_CARDS = 5;
     private static final int TOP_CARD = 0;
-    private static final String END_OF_GAME_MESSAGE = "This game has ended.";
+    private static final String END_OF_GAME_MESSAGE = "This is the end of this game.";
     private static final String TIE_MESSAGE = "This is a tied game.";
 
     private boolean win;
     private boolean cheat;
     private int cheater;
     private int winner;
-    private int currentHighestPoint;
     private Card.Suit changedSuit;
     private List<PlayerStrategy> playerList;
-    private List<Integer> scoreBoardPerGame;
-    private List<Integer> winCount;
     private List<Card> drawPile;
     private List<Card> discardPile;
+    private Map<Integer, List<Card>> playerCards;
+    private ScoreBoard gameScoreboard;
 
     public Game1() {
 
         win = false;
         cheat = false;
-        currentHighestPoint = 0;
-        scoreBoardPerGame = new ArrayList<>();
+        gameScoreboard = new ScoreBoard(TOTAL_PLAYER);
 
         playerList = new ArrayList<>();
         playerList.add(new NonPlayer1());
@@ -41,20 +39,16 @@ public class Game1 {
     public void setup() {
 
         changedSuit = null;
-
-        //Create score board
-        winCount = new ArrayList<>();
-        for(int i = 0; i < TOTAL_PLAYER; i ++) {
-            scoreBoardPerGame.add(0);
-            winCount.add(0);
-        }
+        gameScoreboard.reset();
 
         //deal 5 cards to each player
         drawPile = new ArrayList<>(Card.getDeck());
+        playerCards = new TreeMap<>();
         Collections.shuffle(drawPile);
-
-        for(PlayerStrategy player : playerList) {
-            player.receiveInitialCards(drawPile.subList(TOP_CARD, INITIAL_CARDS));
+        for(int i = 0; i < TOTAL_PLAYER; i++) {
+            List<Card> deal = drawPile.subList(TOP_CARD, INITIAL_CARDS);
+            playerList.get(i).receiveInitialCards(deal);
+            playerCards.put(i, deal);
             drawPile.subList(TOP_CARD, INITIAL_CARDS).clear();
         }
 
@@ -69,17 +63,25 @@ public class Game1 {
 
     public void play() {
 
-        while(!endOfGame()) {
+        while(!endOfGame() && !cheat) {
             Card topDiscardCard = discardPile.get(discardPile.size() - 1);
 
             for (int i = 0; i < TOTAL_PLAYER; i++) {
 
                 if (playerList.get(i).shouldDrawCard(topDiscardCard, changedSuit)) {
-                    playerList.get(i).receiveCard(drawPile.get(TOP_CARD));
+                    //draw card
+                    Card drawn = drawPile.get(TOP_CARD);
+                    playerList.get(i).receiveCard(drawn);
+                    playerCards.get(i).add(drawn);
                     drawPile.remove(TOP_CARD);
                 } else {
+                    //play card
                     Card played = playerList.get(i).playCard();
+                    playerCards.get(i).remove(played);
                     discardPile.add(played);
+
+                    win = checkWin();
+
                     //sort the played card
                     if (played.getRank() == Card.Rank.EIGHT) {
                         changedSuit = playerList.get(i).declareSuit();
@@ -91,16 +93,16 @@ public class Game1 {
                     }
                 }
             }
-
-
         }
-
-
-    }
-
-    public boolean ifCheat() {
-
-        return cheat;
+        System.out.println(END_OF_GAME_MESSAGE);
+        if(win) {
+            gameScoreboard.calculate(playerCards, winner);
+            System.out.println("Player " + winner + " is the winner of this game.");
+        }
+        else if(drawPile.isEmpty()){
+            gameScoreboard.calculate(playerCards);
+            System.out.println(TIE_MESSAGE);
+        }
     }
 
     public int getCheater() {
@@ -115,7 +117,23 @@ public class Game1 {
 
     public boolean endOfGame() {
 
-        return win || cheat || drawPile.isEmpty();
+        return win || drawPile.isEmpty();
+    }
+
+    public List<Integer> getGameScoreList() {
+
+        return gameScoreboard.getScoreList();
+    }
+
+    private boolean checkWin() {
+
+        for(Map.Entry<Integer, List<Card>> entry : playerCards.entrySet()) {
+            if(entry.getValue().isEmpty()) {
+                winner = entry.getKey();
+                return true;
+            }
+        }
+        return false;
     }
 
     private List<Integer> opponentIds(int playerNumber) {
@@ -127,18 +145,6 @@ public class Game1 {
             }
         }
         return opponentIds;
-    }
-
-    private int highestPointPlayer(List<Integer> scoreBoard) {
-
-        int max = 0;
-        for(int i = 0; i < TOTAL_PLAYER; i++) {
-            if(scoreBoard.get(i) > max) {
-                max = scoreBoard.get(i);
-                winner = i;
-            }
-        }
-        return max;
     }
 
     private boolean isValid(Card played, Card topDiscardCard) {
