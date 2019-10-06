@@ -52,18 +52,19 @@ they only serve as general guidelines.
 
 ---
 
-## Overall Design: /20
+## Overall Design: 12/20
+A lot of the functionality is not testable because most of the work is done in the play() method, which doesn't return anything
 
-## Object Decomposition: /30
+## Object Decomposition: 20/20
+Great job
+## Naming and Layout: 16/20
 
-## Naming and Layout: /30
+## Automatic Testing: 0/20
 
-## Automatic Testing: /20
+## Process: 10/10
 
-## Process: /10
+## Presentation: 5/5
 
-## Presentation: /5
+## Participation: 5/5
 
-## Participation: /5
-
-# Grade Total: /100
+# Grade Total: 68/100
